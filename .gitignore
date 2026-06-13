@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.pyc
+
+q_table_othello.pkl
+
+*_stats_othello.csv
+player_stats_othello.csv
+
+tempCodeRunnerFile.py
