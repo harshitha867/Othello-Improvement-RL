@@ -329,12 +329,24 @@ def train_q_learning_visual_custom(episodes=10, alpha=0.1, gamma=0.95,
                 board[row][col] = AI
                 apply_move(board, row, col, AI)
                 reward = 0.0
+
+                # Corner reward
+                corners = [(0,0), (0,7), (7,0), (7,7)]
+                if (row, col) in corners:
+                    reward += 0.5
+
+                # Edge reward
+                elif row == 0 or row == 7 or col == 0 or col == 7:
+                    reward += 0.1
+
+                # Terminal reward
                 if is_terminal_board(board):
                     w = get_winner(board)
+
                     if w == "AI":
-                        reward = 1.0
+                        reward += 1.0
                     elif w == "Human":
-                        reward = -1.0
+                        reward -= 1.0
                     game_over = True
                 new_st = get_state_key(board, HUMAN)
                 if new_st not in q_table:
