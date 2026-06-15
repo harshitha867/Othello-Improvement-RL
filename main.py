@@ -277,8 +277,8 @@ def draw_board_training_visual(board, turn, game_over):
     SCREEN.blit(status_txt, (WIDTH+20, 10))
     pygame.display.update()
 
-def train_q_learning_visual_custom(episodes=10, alpha=0.1, gamma=0.95,
-                                   epsilon=1.0, epsilon_min=0.01, epsilon_decay=0.99):
+def train_q_learning_visual_custom(episodes=100, alpha=0.2, gamma=0.99,
+                                   epsilon=1.0, epsilon_min=0.01, epsilon_decay=0.995):
     global q_table
     ep = 0
     clock = pygame.time.Clock()
@@ -304,7 +304,7 @@ def train_q_learning_visual_custom(episodes=10, alpha=0.1, gamma=0.95,
                             pickle.dump(q_table, f)
                         print(f"[TRAIN VISUAL] Early exit. {ep} episodes done.")
                         return
-
+        
             if turn == AI:
                 st = get_state_key(board, AI)
                 if st not in q_table:
@@ -383,10 +383,17 @@ def train_q_learning_visual_custom(episodes=10, alpha=0.1, gamma=0.95,
                     game_over = True
                 else:
                     turn = AI
-
         ep += 1
-        if epsilon > epsilon_min:
-            epsilon *= epsilon_decay
+            # Adaptive Exploration Strategy
+        if ep < episodes * 0.3:
+            epsilon = 1.0
+
+        elif ep < episodes * 0.7:
+            epsilon = 0.3
+
+        else:
+            epsilon = 0.05
+
         print(f"[TRAIN VISUAL] Episode {ep}/{episodes} done. Epsilon={epsilon:.3f}")
 
     with open("q_table_othello.pkl", "wb") as f:
