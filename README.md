@@ -15,6 +15,7 @@ The detailed report (see summary below) covers the mathematical foundations, imp
 - [Installation & Usage](#installation--usage)
 - [Code Structure](#code-structure)
 - [Results & Evaluation](#results--evaluation)
+- [Reinforcement Learning Improvements](#reinforcement-learning-improvements)
 - [References](#references)
 
 ---
@@ -116,6 +117,89 @@ Below are screenshots from various parts of the project interface:
   Total number of games played and AI win counts by algorithm.
 
 ---
+
+## Reinforcement Learning Improvements
+
+As part of the project enhancement, the original Q-Learning implementation was improved using three reinforcement learning strategies.
+
+### Improvement 1: Reward Shaping
+
+The reward function was modified to encourage strategically strong moves.
+
+* Corner positions: +0.5 reward
+* Edge positions: +0.1 reward
+* Win reward: +1.0
+* Loss penalty: -1.0
+
+This helps the agent prioritize stable board positions and improve long-term gameplay performance.
+
+### Improvement 2: Adaptive Exploration Strategy
+
+Instead of using a fixed exploration rate, epsilon is adjusted during training:
+
+| Training Phase | Epsilon |
+| -------------- | ------- |
+| Early Training | 1.0     |
+| Mid Training   | 0.3     |
+| Late Training  | 0.05    |
+
+This allows extensive exploration initially and greater exploitation of learned knowledge in later stages.
+
+### Improvement 3: Multi-Opponent Training
+
+The Q-Learning agent was trained against multiple Minimax opponents of varying strengths:
+
+* Minimax Easy (depth 1)
+* Minimax Hard (depth 2)
+* Minimax Extreme (depth 3)
+
+Training against multiple opponents improves robustness and generalization.
+
+### Training Outcome
+
+| Metric         | Baseline | Improved |
+| -------------- | -------- | -------- |
+| Learned States | 5,560    | 28,671   |
+
+The improved agent explored a significantly larger portion of the state space during training.
+
+Additional implementation screenshots and evaluation results are available in the `results/` folder.
+
+### Improvement Screenshots
+
+#### Reward Shaping
+![Reward Shaping](results/improv_1_reward_shaping.png)
+
+#### Adaptive Exploration
+![Adaptive Exploration](results/improv_2_adaptive_exploration.png)
+
+#### Multi-Opponent Training
+![Multi Opponent Training](results/improv_3_multi_opponent_training.png)
+
+#### Training Summary
+![Training Summary](results/training_summary.png)
+
+#### State Space Growth
+![State Comparison](results/state_count_comparison.png)
+
+#### Learned States Comparison
+![Learned States](results/learned_states_graph.png)
+
+#### Q-Learning Performance
+![Q-Learning Performance](results/q_learning_performance.png)
+
+#### Q-Table Growth
+![Q-Table Growth](results/q_table_growth_chart.png)
+
+#### Mid-Game Example 1
+![Midgame 1](results/midgame_1.png)
+
+#### Mid-Game Example 2
+![Midgame 2](results/midgame_2.png)
+
+#### Final Game Result
+![Final Result](results/final_game_result.png)
+
 
 ## Installation & Usage
 

@@ -294,6 +294,7 @@ def train_q_learning_visual_custom(episodes=100, alpha=0.2, gamma=0.99,
         board = create_board()
         game_over = False
         turn = random.choice([HUMAN, AI])
+        # Train against different opponents
         opponent_type = random.choice([
         "minimax_hard",
         "minimax_hard",
