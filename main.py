@@ -280,6 +280,11 @@ def draw_board_training_visual(board, turn, game_over):
 def train_q_learning_visual_custom(episodes=100, alpha=0.2, gamma=0.99,
                                    epsilon=1.0, epsilon_min=0.01, epsilon_decay=0.995):
     global q_table
+    opponent_stats = {
+        "minimax_easy": {"win": 0, "loss": 0, "draw": 0},
+        "minimax_hard": {"win": 0, "loss": 0, "draw": 0},
+        "minimax_extreme": {"win": 0, "loss": 0, "draw": 0}
+    }
     ep = 0
     clock = pygame.time.Clock()
 
@@ -289,6 +294,13 @@ def train_q_learning_visual_custom(episodes=100, alpha=0.2, gamma=0.99,
         board = create_board()
         game_over = False
         turn = random.choice([HUMAN, AI])
+        opponent_type = random.choice([
+        "minimax_hard",
+        "minimax_hard",
+        "minimax_easy",
+        "minimax_extreme"
+])
+        print(f"Episode {ep+1}: Opponent = {opponent_type}")
         # Q-Learning eğitim döngüsü
         while not game_over:
             draw_board_training_visual(board, turn, game_over)
@@ -345,8 +357,14 @@ def train_q_learning_visual_custom(episodes=100, alpha=0.2, gamma=0.99,
 
                     if w == "AI":
                         reward += 1.0
+                        opponent_stats[opponent_type]["win"] += 1
+
                     elif w == "Human":
                         reward -= 1.0
+                        opponent_stats[opponent_type]["loss"] += 1
+                    else:
+                        opponent_stats[opponent_type]["draw"] += 1
+
                     game_over = True
                 new_st = get_state_key(board, HUMAN)
                 if new_st not in q_table:
@@ -373,13 +391,29 @@ def train_q_learning_visual_custom(episodes=100, alpha=0.2, gamma=0.99,
                     if not valid_moves(board, AI):
                         game_over = True
                     continue
-                best_mv, _ = minimax(board, TRAIN_MINIMAX_DEPTH, -math.inf, math.inf, False, AI)
+                if opponent_type == "minimax_easy":
+                    best_mv, _ = minimax(board, 1,-math.inf, math.inf,False, AI)
+
+                elif opponent_type == "minimax_hard":
+                    best_mv, _ = minimax(board, 2,-math.inf, math.inf,False, AI)
+
+                elif opponent_type == "minimax_extreme":
+                    best_mv, _ = minimax(board, 3,-math.inf, math.inf,False, AI)
+
                 if best_mv is None:
                     best_mv = random.choice(moves)
                 r, c = best_mv
                 board[r][c] = HUMAN
                 apply_move(board, r, c, HUMAN)
                 if is_terminal_board(board):
+                    w = get_winner(board)
+
+                    if w == "AI":
+                        opponent_stats[opponent_type]["win"] += 1
+                    elif w == "Human":
+                        opponent_stats[opponent_type]["loss"] += 1
+                    else:
+                        opponent_stats[opponent_type]["draw"] += 1
                     game_over = True
                 else:
                     turn = AI
@@ -395,6 +429,26 @@ def train_q_learning_visual_custom(episodes=100, alpha=0.2, gamma=0.99,
             epsilon = 0.05
 
         print(f"[TRAIN VISUAL] Episode {ep}/{episodes} done. Epsilon={epsilon:.3f}")
+    print("\n===== TRAINING SUMMARY =====")
+
+    total_games = 0
+
+    for stats in opponent_stats.values():
+        total_games += stats["win"] + stats["loss"] + stats["draw"]
+
+    print(f"\nTotal Recorded Games = {total_games}")
+
+    for opp, stats in opponent_stats.items():
+        total = stats["win"] + stats["loss"] + stats["draw"]
+
+        print(f"\n{opp}")
+        print(f"Wins   : {stats['win']}")
+        print(f"Losses : {stats['loss']}")
+        print(f"Draws  : {stats['draw']}")
+
+        if total > 0:
+            win_rate = (stats["win"] / total) * 100
+            print(f"Win Rate: {win_rate:.2f}%")
 
     with open("q_table_othello.pkl", "wb") as f:
         pickle.dump(q_table, f)
